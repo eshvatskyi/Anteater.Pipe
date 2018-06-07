@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Anteater.Pipe", "src\Anteater.Pipe\Anteater.Pipe.csproj", "{B88C84A4-2BA0-428A-9CD2-062A59DA44BD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Anteater.Pipe.Tests", "test\Anteater.Pipe.Tests\Anteater.Pipe.Tests.csproj", "{B3991712-265A-4728-B2F1-F84238231725}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B88C84A4-2BA0-428A-9CD2-062A59DA44BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B88C84A4-2BA0-428A-9CD2-062A59DA44BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B88C84A4-2BA0-428A-9CD2-062A59DA44BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B88C84A4-2BA0-428A-9CD2-062A59DA44BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3991712-265A-4728-B2F1-F84238231725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3991712-265A-4728-B2F1-F84238231725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3991712-265A-4728-B2F1-F84238231725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3991712-265A-4728-B2F1-F84238231725}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F3A74A6-80FC-4D23-B043-21FDC55D1739}
+	EndGlobalSection
+EndGlobal
