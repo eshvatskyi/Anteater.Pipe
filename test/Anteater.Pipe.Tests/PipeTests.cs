@@ -38,11 +38,11 @@ namespace Anteater.Pipe.Tests
                 .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) => await next());
             _services.AddScoped(_ => testCommandMiddleWare.Object);
 
-            var commandHandler = new Mock<IPipeHandler<TestCommand>>();
+            var commandHandler = new Mock<PipeHandler<TestCommand>>();
             commandHandler
                 .Setup(x => x.HandleAsync(It.IsAny<TestCommand>()))
                 .Returns(Task.CompletedTask);
-            _services.AddScoped(_ => commandHandler.Object);
+            _services.AddScoped<IPipeHandler<TestCommand>>(_ => commandHandler.Object);
 
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -88,11 +88,11 @@ namespace Anteater.Pipe.Tests
                 });
             _services.AddScoped(_ => testCommandMiddleWare.Object);
 
-            var commandHandler = new Mock<IPipeHandler<TestCommandWithResult, int>>();
+            var commandHandler = new Mock<PipeHandler<TestCommandWithResult, int>>();
             commandHandler
                 .Setup(x => x.HandleAsync(It.IsAny<TestCommandWithResult>()))
                 .Returns<TestCommandWithResult>(c => Task.FromResult(c.Input + 1));
-            _services.AddScoped(_ => commandHandler.Object);
+            _services.AddScoped<IPipeHandler<TestCommandWithResult>>(_ => commandHandler.Object);
 
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -116,10 +116,10 @@ namespace Anteater.Pipe.Tests
         [Fact]
         public async Task PublishEventTest()
         {
-            var eventHandler = new Mock<IPipeHandler<TestEvent>>();
+            var eventHandler = new Mock<PipeHandler<TestEvent>>();
             eventHandler.Setup(x => x.HandleAsync(It.IsAny<TestEvent>()));
 
-            _services.AddScoped(_ => eventHandler.Object);
+            _services.AddScoped<IPipeHandler<TestEvent>>(_ => eventHandler.Object);
 
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -143,9 +143,9 @@ namespace Anteater.Pipe.Tests
             public int Input { get; set; }
         }
 
-        public class TestCommandWithResultHandler : IPipeHandler<TestCommandWithResult, int>
+        public class TestCommandWithResultHandler : PipeHandler<TestCommandWithResult, int>
         {
-            public Task<int> HandleAsync(TestCommandWithResult projectile)
+            public override Task<int> HandleAsync(TestCommandWithResult projectile)
             {
                 throw new NotImplementedException();
             }

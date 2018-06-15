@@ -23,12 +23,11 @@
         public async Task ExecuteAsync(ICommand command)
         {
             var type = typeof(IPipeHandler<>).MakeGenericType(command.GetType());
-            var method = type.GetMethod(nameof(IPipeHandler<ICommand>.HandleAsync));
-            var handler = _services.GetRequiredService(type);
+            var handler = (IPipeAction)_services.GetRequiredService(type);
 
             Func<Task<IPipeEcho>> next = async () =>
             {
-                await (Task)method.Invoke(handler, new[] { command });
+                await handler.HandleAsync(command);
                 return null;
             };
 
@@ -43,13 +42,12 @@
 
         public async Task<TResult> ExecuteAsync<TResult>(ICommand<TResult> command)
         {
-            var type = typeof(IPipeHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
-            var method = type.GetMethod(nameof(IPipeHandler<ICommand, TResult>.HandleAsync));
-            var handler = _services.GetRequiredService(type);
+            var type = typeof(IPipeHandler<>).MakeGenericType(command.GetType());
+            var handler = (IPipeFunction<TResult>)_services.GetRequiredService(type);
 
             Func<Task<IPipeEcho>> next = async () =>
             {
-                var res = await (Task<TResult>)method.Invoke(handler, new[] { command });
+                var res = await handler.HandleAsync(command);
                 return new PipeEcho<TResult>(res);
             };
 
@@ -72,7 +70,7 @@
         public void PublishAsync<TEvent>(TEvent @event)
             where TEvent : class, IEvent
         {
-            var handlers = _services.GetServices<IPipeHandler<TEvent>>().ToList();
+            var handlers = _services.GetServices<IPipeHandler<TEvent>>().OfType<IPipeAction>().ToList();
 
             Func<Task<IPipeEcho>> next = async () =>
             {
