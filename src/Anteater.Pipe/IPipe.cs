@@ -27,17 +27,17 @@
 
             Func<Task<IPipeEcho>> next = async () =>
             {
-                await handler.HandleAsync(command);
+                await handler.HandleAsync(command).ConfigureAwait(false);
                 return null;
             };
 
             foreach (var middleware in _services.GetMiddlewares(command.GetType()))
             {
                 var prev = next;
-                next = async () => await middleware.HandleAsync(command, prev);
+                next = async () => await middleware.HandleAsync(command, prev).ConfigureAwait(false);
             }
 
-            await next();
+            await next().ConfigureAwait(false);
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(ICommand<TResult> command)
@@ -47,17 +47,17 @@
 
             Func<Task<IPipeEcho>> next = async () =>
             {
-                var res = await handler.HandleAsync(command);
+                var res = await handler.HandleAsync(command).ConfigureAwait(false);
                 return new PipeEcho<TResult>(res);
             };
 
             foreach (var middleware in _services.GetMiddlewares(command.GetType()))
             {
                 var prev = next;
-                next = async () => await middleware.HandleAsync(command, prev);
+                next = async () => await middleware.HandleAsync(command, prev).ConfigureAwait(false);
             }
 
-            var result = await next();
+            var result = await next().ConfigureAwait(false);
 
             if (result is PipeEcho<TResult> typedResult)
             {
@@ -74,17 +74,17 @@
 
             Func<Task<IPipeEcho>> next = async () =>
             {
-                await Task.WhenAll(handlers.Select(x => x.HandleAsync(@event)));
+                await Task.WhenAll(handlers.Select(x => x.HandleAsync(@event))).ConfigureAwait(false);
                 return null;
             };
 
             foreach (var middleware in _services.GetMiddlewares<TEvent>())
             {
                 var prev = next;
-                next = async () => await middleware.HandleAsync(@event, prev);
+                next = async () => await middleware.HandleAsync(@event, prev).ConfigureAwait(false);
             }
 
-            Task.Run(() => next());
+            _ = Task.Run(async () => await next().ConfigureAwait(false));
         }
     }
 }

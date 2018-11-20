@@ -5,7 +5,7 @@ namespace Anteater.Pipe.Tests
     using Anteater.Pipe.Commands;
     using Anteater.Pipe.Events;
     using Microsoft.Extensions.DependencyInjection;
-    using Moq;
+    using NSubstitute;
     using Xunit;
 
     public class PipeTests
@@ -20,29 +20,25 @@ namespace Anteater.Pipe.Tests
         [Fact]
         public async Task ExecutingCommandTest()
         {
-            var projectileMiddleWare = new Mock<IPipeMiddleware<IPipeProjectile>>();
-            projectileMiddleWare
-                .Setup(x => x.HandleAsync(It.IsAny<IPipeProjectile>(), It.IsAny<Func<Task<IPipeEcho>>>()))
-                .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) => await next());
-            _services.AddScoped(_ => projectileMiddleWare.Object);
+            var projectileMiddleWare = Substitute.For<IPipeMiddleware<IPipeProjectile>>();
+            projectileMiddleWare.HandleAsync(Arg.Any<IPipeProjectile>(), Arg.Any<Func<Task<IPipeEcho>>>())
+                .Returns(async c => await c.Arg<Func<Task<IPipeEcho>>>()());
+            _services.AddScoped(_ => projectileMiddleWare);
 
-            var commandMiddleWare = new Mock<IPipeMiddleware<ICommand>>();
-            commandMiddleWare
-                .Setup(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()))
-                .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) => await next());
-            _services.AddScoped(_ => commandMiddleWare.Object);
+            var commandMiddleWare = Substitute.For<IPipeMiddleware<ICommand>>();
+            commandMiddleWare.HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>())
+                .Returns(async c => await c.Arg<Func<Task<IPipeEcho>>>()());
+            _services.AddScoped(_ => commandMiddleWare);
 
-            var testCommandMiddleWare = new Mock<IPipeMiddleware<TestCommand>>();
-            testCommandMiddleWare
-                .Setup(x => x.HandleAsync(It.IsAny<TestCommand>(), It.IsAny<Func<Task<IPipeEcho>>>()))
-                .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) => await next());
-            _services.AddScoped(_ => testCommandMiddleWare.Object);
+            var testCommandMiddleWare = Substitute.For<IPipeMiddleware<TestCommand>>();
+            testCommandMiddleWare.HandleAsync(Arg.Any<TestCommand>(), Arg.Any<Func<Task<IPipeEcho>>>())
+                .Returns(async c => await c.Arg<Func<Task<IPipeEcho>>>()());
+            _services.AddScoped(_ => testCommandMiddleWare);
 
-            var commandHandler = new Mock<PipeHandler<TestCommand>>();
-            commandHandler
-                .Setup(x => x.HandleAsync(It.IsAny<TestCommand>()))
+            var commandHandler = Substitute.For<PipeHandler<TestCommand>>();
+            commandHandler.HandleAsync(Arg.Any<TestCommand>())
                 .Returns(Task.CompletedTask);
-            _services.AddScoped<IPipeHandler<TestCommand>>(_ => commandHandler.Object);
+            _services.AddScoped<IPipeHandler<TestCommand>>(_ => commandHandler);
 
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -52,33 +48,30 @@ namespace Anteater.Pipe.Tests
 
             await bus.ExecuteAsync(command);
 
-            projectileMiddleWare.Verify(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()), Times.Once);
-            commandMiddleWare.Verify(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()), Times.Once);
-            testCommandMiddleWare.Verify(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()), Times.Once);
-            commandHandler.Verify(x => x.HandleAsync(It.IsAny<TestCommand>()), Times.Once);
+            await projectileMiddleWare.Received(1).HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>());
+            await commandMiddleWare.Received(1).HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>());
+            await testCommandMiddleWare.Received(1).HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>());
+            await commandHandler.Received(1).HandleAsync(Arg.Any<TestCommand>());
         }
 
         [Fact]
         public async Task ExecutingCommandWithResultTest()
         {
-            var projectileMiddleWare = new Mock<IPipeMiddleware<IPipeProjectile>>();
-            projectileMiddleWare
-                .Setup(x => x.HandleAsync(It.IsAny<IPipeProjectile>(), It.IsAny<Func<Task<IPipeEcho>>>()))
-                .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) => await next());
-            _services.AddScoped(_ => projectileMiddleWare.Object);
+            var projectileMiddleWare = Substitute.For<IPipeMiddleware<IPipeProjectile>>();
+            projectileMiddleWare.HandleAsync(Arg.Any<IPipeProjectile>(), Arg.Any<Func<Task<IPipeEcho>>>())
+                .Returns(async c => await c.Arg<Func<Task<IPipeEcho>>>()());
+            _services.AddScoped(_ => projectileMiddleWare);
 
-            var commandMiddleWare = new Mock<IPipeMiddleware<ICommand>>();
-            commandMiddleWare
-                .Setup(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()))
-                .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) => await next());
-            _services.AddScoped(_ => commandMiddleWare.Object);
+            var commandMiddleWare = Substitute.For<IPipeMiddleware<ICommand>>();
+            commandMiddleWare.HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>())
+                .Returns(async c => await c.Arg<Func<Task<IPipeEcho>>>()());
+            _services.AddScoped(_ => commandMiddleWare);
 
-            var testCommandMiddleWare = new Mock<IPipeMiddleware<TestCommandWithResult>>();
-            testCommandMiddleWare
-                .Setup(x => x.HandleAsync(It.IsAny<TestCommandWithResult>(), It.IsAny<Func<Task<IPipeEcho>>>()))
-                .Returns<IPipeProjectile, Func<Task<IPipeEcho>>>(async (p, next) =>
+            var testCommandMiddleWare = Substitute.For<IPipeMiddleware<TestCommandWithResult>>();
+            testCommandMiddleWare.HandleAsync(Arg.Any<TestCommandWithResult>(), Arg.Any<Func<Task<IPipeEcho>>>())
+                .Returns(async c =>
                 {
-                    var responseValue = await next();
+                    var responseValue = await c.Arg<Func<Task<IPipeEcho>>>()();
                     if (responseValue is IPipeEcho<int> value)
                     {
                         return new PipeEcho<int>(value.Result + 1);
@@ -86,13 +79,12 @@ namespace Anteater.Pipe.Tests
 
                     return responseValue;
                 });
-            _services.AddScoped(_ => testCommandMiddleWare.Object);
+            _services.AddScoped(_ => testCommandMiddleWare);
 
-            var commandHandler = new Mock<PipeHandler<TestCommandWithResult, int>>();
-            commandHandler
-                .Setup(x => x.HandleAsync(It.IsAny<TestCommandWithResult>()))
-                .Returns<TestCommandWithResult>(c => Task.FromResult(c.Input + 1));
-            _services.AddScoped<IPipeHandler<TestCommandWithResult>>(_ => commandHandler.Object);
+            var commandHandler = Substitute.For<PipeHandler<TestCommandWithResult, int>>();
+            commandHandler.HandleAsync(Arg.Any<TestCommandWithResult>())
+                .Returns(c => Task.FromResult(c.Arg<TestCommandWithResult>().Input + 1));
+            _services.AddScoped<IPipeHandler<TestCommandWithResult>>(_ => commandHandler);
 
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -105,10 +97,10 @@ namespace Anteater.Pipe.Tests
 
             var result = await bus.ExecuteAsync(command);
 
-            projectileMiddleWare.Verify(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()), Times.Once);
-            commandMiddleWare.Verify(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()), Times.Once);
-            testCommandMiddleWare.Verify(x => x.HandleAsync(It.IsAny<ICommand>(), It.IsAny<Func<Task<IPipeEcho>>>()), Times.Once);
-            commandHandler.Verify(x => x.HandleAsync(It.IsAny<TestCommandWithResult>()), Times.Once);
+            await projectileMiddleWare.Received(1).HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>());
+            await commandMiddleWare.Received(1).HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>());
+            await testCommandMiddleWare.Received(1).HandleAsync(Arg.Any<ICommand>(), Arg.Any<Func<Task<IPipeEcho>>>());
+            await commandHandler.Received(1).HandleAsync(Arg.Any<TestCommandWithResult>());
 
             Assert.Equal(command.Input + 2, result);
         }
@@ -116,10 +108,9 @@ namespace Anteater.Pipe.Tests
         [Fact]
         public async Task PublishEventTest()
         {
-            var eventHandler = new Mock<PipeHandler<TestEvent>>();
-            eventHandler.Setup(x => x.HandleAsync(It.IsAny<TestEvent>()));
+            var eventHandler = Substitute.For<PipeHandler<TestEvent>>();
 
-            _services.AddScoped<IPipeHandler<TestEvent>>(_ => eventHandler.Object);
+            _services.AddScoped<IPipeHandler<TestEvent>>(_ => eventHandler);
 
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -131,7 +122,7 @@ namespace Anteater.Pipe.Tests
 
             await Task.Delay(1000);
 
-            eventHandler.Verify(x => x.HandleAsync(@event), Times.Once);
+            await eventHandler.Received(1).HandleAsync(@event);
         }
 
         public class TestCommand : ICommand
