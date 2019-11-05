@@ -1,4 +1,4 @@
-﻿namespace Anteater.Pipe
+namespace Anteater.Pipe
 {
     using System.Threading.Tasks;
 
@@ -22,7 +22,10 @@
     {
         public abstract Task HandleAsync(TProjectile projectile);
 
-        Task IPipeAction.HandleAsync(IPipeProjectile projectile) => HandleAsync((TProjectile)projectile);
+        Task IPipeAction.HandleAsync(IPipeProjectile projectile)
+        {
+            return HandleAsync((TProjectile)projectile);
+        }
     }
 
     public abstract class PipeHandler<TProjectile, TResult> : IPipeHandler<TProjectile>, IPipeFunction<TResult>
@@ -30,6 +33,9 @@
     {
         public abstract Task<TResult> HandleAsync(TProjectile projectile);
 
-        Task<TResult> IPipeFunction<TResult>.HandleAsync(IPipeProjectile projectile) => HandleAsync((TProjectile)projectile);
+        Task<TResult> IPipeFunction<TResult>.HandleAsync(IPipeProjectile projectile)
+        {
+            return HandleAsync((TProjectile)projectile);
+        }
     }
 }

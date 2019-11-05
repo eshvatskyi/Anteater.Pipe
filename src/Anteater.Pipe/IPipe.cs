@@ -1,4 +1,4 @@
-﻿namespace Anteater.Pipe
+namespace Anteater.Pipe
 {
     using System;
     using System.Linq;
@@ -13,17 +13,19 @@
 
     internal class Pipe : IPipe
     {
-        private readonly IServiceProvider _services;
+        private readonly Func<IServiceProvider> _serviceProviderFactory;
 
-        public Pipe(IServiceProvider services)
+        public Pipe(Func<IServiceProvider> serviceProviderFactory)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _serviceProviderFactory = serviceProviderFactory ?? throw new ArgumentNullException(nameof(serviceProviderFactory));
         }
 
         public async Task ExecuteAsync(ICommand command)
         {
+            var services = GetServiceProvider();
+
             var type = typeof(IPipeHandler<>).MakeGenericType(command.GetType());
-            var handler = (IPipeAction)_services.GetRequiredService(type);
+            var handler = (IPipeAction)services.GetRequiredService(type);
 
             Func<Task<IPipeEcho>> next = async () =>
             {
@@ -31,10 +33,10 @@
                 return null;
             };
 
-            foreach (var middleware in _services.GetMiddlewares(command.GetType()))
+            foreach (var middleware in services.GetMiddlewares(command.GetType()))
             {
                 var prev = next;
-                next = async () => await middleware.HandleAsync(command, prev).ConfigureAwait(false);
+                next = () => middleware.HandleAsync(command, prev);
             }
 
             await next().ConfigureAwait(false);
@@ -42,8 +44,10 @@
 
         public async Task<TResult> ExecuteAsync<TResult>(ICommand<TResult> command)
         {
+            var services = GetServiceProvider();
+
             var type = typeof(IPipeHandler<>).MakeGenericType(command.GetType());
-            var handler = (IPipeFunction<TResult>)_services.GetRequiredService(type);
+            var handler = (IPipeFunction<TResult>)services.GetRequiredService(type);
 
             Func<Task<IPipeEcho>> next = async () =>
             {
@@ -51,10 +55,10 @@
                 return new PipeEcho<TResult>(res);
             };
 
-            foreach (var middleware in _services.GetMiddlewares(command.GetType()))
+            foreach (var middleware in services.GetMiddlewares(command.GetType()))
             {
                 var prev = next;
-                next = async () => await middleware.HandleAsync(command, prev).ConfigureAwait(false);
+                next = () => middleware.HandleAsync(command, prev);
             }
 
             var result = await next().ConfigureAwait(false);
@@ -70,7 +74,9 @@
         public void PublishAsync<TEvent>(TEvent @event)
             where TEvent : class, IEvent
         {
-            var handlers = _services.GetServices<IPipeHandler<TEvent>>().OfType<IPipeAction>().ToList();
+            var services = GetServiceProvider();
+
+            var handlers = services.GetServices<IPipeHandler<TEvent>>().OfType<IPipeAction>().ToList();
 
             Func<Task<IPipeEcho>> next = async () =>
             {
@@ -78,13 +84,18 @@
                 return null;
             };
 
-            foreach (var middleware in _services.GetMiddlewares<TEvent>())
+            foreach (var middleware in services.GetMiddlewares<TEvent>())
             {
                 var prev = next;
-                next = async () => await middleware.HandleAsync(@event, prev).ConfigureAwait(false);
+                next = () => middleware.HandleAsync(@event, prev);
             }
 
-            _ = Task.Run(async () => await next().ConfigureAwait(false));
+            _ = next();
+        }
+
+        private IServiceProvider GetServiceProvider()
+        {
+            return _serviceProviderFactory.Invoke();
         }
     }
 }

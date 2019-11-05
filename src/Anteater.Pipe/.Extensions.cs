@@ -1,4 +1,4 @@
-﻿namespace Anteater.Pipe
+namespace Anteater.Pipe
 {
     using System;
     using System.Collections.Generic;
@@ -31,6 +31,9 @@
         }
 
         public static IEnumerable<IPipeMiddleware> GetMiddlewares<TProjectile>(this IServiceProvider provider)
-            where TProjectile : IPipeProjectile => provider.GetMiddlewares(typeof(TProjectile));
+            where TProjectile : IPipeProjectile
+        {
+            return provider.GetMiddlewares(typeof(TProjectile));
+        }
     }
 }
