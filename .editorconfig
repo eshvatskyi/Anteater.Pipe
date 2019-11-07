@@ -16,7 +16,7 @@ trim_trailing_whitespace = true
 indent_size = 2
 
 # Various XML Configuration Files
-[*.{xml,config,props,targets,nuspec}]
+[*.{xml,config,props,targets,nuspec,yml}]
 indent_size = 2
 
 # Code files

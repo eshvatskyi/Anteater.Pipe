@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>    
+    <LangVersion>latest</LangVersion>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <RepositoryRootDirectory>$(MSBuildThisFileDirectory)</RepositoryRootDirectory>
   </PropertyGroup>
@@ -9,11 +9,6 @@
   <PropertyGroup>
     <Authors>Anteater</Authors>
     <Copyright>© Anteater. All rights reserved.</Copyright>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <netcoreapptarget>netcoreapp2.1</netcoreapptarget>
-    <netstandardtarget>netstandard2.0</netstandardtarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

@@ -1,4 +1,4 @@
-﻿namespace Anteater.Pipe.Tests
+namespace Anteater.Pipe.Tests
 {
     using System;
     using System.Threading.Tasks;
