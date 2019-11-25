@@ -1,0 +1,32 @@
+name: test
+
+on: [push]
+
+env:
+  BUILD_CONFIGURATION: Release
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [netcoreapp2.2, netcoreapp3.0]
+
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.2.402
+
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.0.100
+
+      - run: rsync -a ${DOTNET_ROOT/3.0.100/2.2.402}/* $DOTNET_ROOT/
+
+      - name: Test
+        run: dotnet test -c ${BUILD_CONFIGURATION} -f ${{ matrix.framework }}

@@ -1,0 +1,39 @@
+name: pack
+
+on:
+  push:
+    branches:    
+      - master
+
+env:
+  BUILD_CONFIGURATION: Release
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs: 
+  pack:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.0.100
+
+      - uses: einaregilsson/build-number@v2 
+        with:
+          token: ${{ secrets.github_token }}
+
+      - name: Generate build number
+        run: echo "::set-env name=BUILD_HASH::`git log --pretty=format:%h -n 1`"
+
+      - name: Test
+        run: dotnet test -c $BUILD_CONFIGURATION -f netcoreapp3.0
+
+      - name: Pack nuget package
+        run: dotnet pack -c $BUILD_CONFIGURATION --version-suffix=-alfa-$BUILD_NUMBER-$BUILD_HASH -o ./out
+
+      - name: Publish
+        if: success()
+        run: dotnet nuget push ./out/Anteater.Pipe.1.0.0-alfa-$BUILD_NUMBER-$BUILD_HASH.nupkg ${{ secrets.NUGET_APIKEY }}
