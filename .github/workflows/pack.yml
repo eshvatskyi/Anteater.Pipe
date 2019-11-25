@@ -2,7 +2,7 @@ name: pack
 
 on:
   push:
-    branches:    
+    branches:
       - master
 
 env:
@@ -11,7 +11,6 @@ env:
 
 jobs: 
   pack:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -27,9 +26,6 @@ jobs:
 
       - name: Generate build number
         run: echo "::set-env name=BUILD_HASH::`git log --pretty=format:%h -n 1`"
-
-      - name: Test
-        run: dotnet test -c $BUILD_CONFIGURATION -f netcoreapp3.0
 
       - name: Pack nuget package
         run: dotnet pack -c $BUILD_CONFIGURATION --version-suffix=-alfa-$BUILD_NUMBER-$BUILD_HASH -o ./out
