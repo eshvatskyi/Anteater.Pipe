@@ -32,4 +32,4 @@ jobs:
 
       - name: Publish
         if: success()
-        run: dotnet nuget push ./out/Anteater.Pipe.1.0.0-alfa-$BUILD_NUMBER-$BUILD_HASH.nupkg ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./out/Anteater.Pipe.1.0.0-alfa-$BUILD_NUMBER-$BUILD_HASH.nupkg -k ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
