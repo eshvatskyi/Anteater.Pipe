@@ -1,4 +1,4 @@
-﻿namespace Anteater.Pipe.Events
+namespace Anteater.Pipe
 {
     public interface IEvent : IPipeProjectile
     {
