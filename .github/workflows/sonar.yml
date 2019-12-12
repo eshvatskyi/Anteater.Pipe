@@ -1,8 +1,10 @@
 name: quality gate
 
 on:
-  pull_request:
-    types: [opened, edited]
+  push:
+    branches-ignore:
+      - master
+      - 'releases/**'
 
 jobs:
   sonar:
