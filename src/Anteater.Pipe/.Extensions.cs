@@ -29,11 +29,5 @@ namespace Anteater.Pipe
                 .GroupBy(x => x.GetType())
                 .Select(x => x.First());
         }
-
-        public static IEnumerable<IPipeMiddleware> GetMiddlewares<TProjectile>(this IServiceProvider provider)
-            where TProjectile : IPipeProjectile
-        {
-            return provider.GetMiddlewares(typeof(TProjectile));
-        }
     }
 }

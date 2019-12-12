@@ -1,4 +1,4 @@
-﻿namespace Anteater.Pipe.Commands
+namespace Anteater.Pipe
 {
     public interface ICommand : IPipeProjectile
     {
