@@ -1,8 +1,10 @@
 name: test
 
 on:
-  pull_request:
-    types: [opened, edited]
+  push:
+    branches-ignore:
+      - master
+      - 'releases/**'
 
 env:
   BUILD_CONFIGURATION: Release
