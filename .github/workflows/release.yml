@@ -21,9 +21,11 @@ jobs:
 
       - name: Assigning release version
         run: |
-          echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}"
-          if [ ${{ steps.version.outputs.patch }} > 0 ]; then
-            echo "::set-env name=RELEASE_VERSION::${{ env.RELEASE_VERSION }}-build-${{ steps.version.outputs.micro_patch }}"
+          if [ ${{ steps.version.outputs.patch }} > 0 ]; 
+          then
+            echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}"
+          else
+            echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-build-${{ steps.version.outputs.micro_patch }}"
           fi
 
       - uses: actions/setup-dotnet@v1
