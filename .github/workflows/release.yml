@@ -20,7 +20,7 @@ jobs:
         uses: ncipollo/semantic-version-action@v1
 
       - name: Assigning release version
-        run: echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}.${{ steps.version.outputs.micro_patch }}"
+        run: echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}"
 
       - uses: actions/setup-dotnet@v1
         with:
