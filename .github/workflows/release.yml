@@ -10,7 +10,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs: 
-  pack:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,15 +28,19 @@ jobs:
 
       - name: Pack nuget release package
         if: steps.version.outputs.micro_patch == 0
-        run: dotnet pack -c $BUILD_CONFIGURATION -p:PackageVersion=$RELEASE_VERSION -o ./out
+        run: |
+          dotnet pack -c $BUILD_CONFIGURATION -p:PackageVersion=$RELEASE_VERSION -o ./out
+          echo "::set-env name=FILENAME_SUFFIX::$RELEASE_VERSION"
         
       - name: Pack nuget pre-release package
         if: steps.version.outputs.micro_patch > 0
-        run: dotnet pack -c $BUILD_CONFIGURATION -p:PackageVersion=$RELEASE_VERSION --version-suffix='.${{ steps.version.outputs.micro_patch }}' -o ./out
+        run: |
+          dotnet pack -c $BUILD_CONFIGURATION -p:PackageVersion=$RELEASE_VERSION --version-suffix='-build-${{ steps.version.outputs.micro_patch }}' -o ./out
+          echo "::set-env name=FILENAME_SUFFIX::$RELEASE_VERSION-build-${{ steps.version.outputs.micro_patch }}"
 
       - name: Publish
         if: success()
-        run: dotnet nuget push ./out/Anteater.Pipe.$RELEASE_VERSION.nupkg -k ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./out/Anteater.Pipe.$FILENAME_SUFFIX.nupkg -k ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
 
       - name: Creating release
         uses: actions/create-release@v1.0.0
@@ -44,6 +48,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release $RELEASE_VERSION
+          release_name: Release ${{ FILENAME_SUFFIX }}
           draft: false
           prerelease: ${{ steps.version.outputs.micro_patch > 0 }}
