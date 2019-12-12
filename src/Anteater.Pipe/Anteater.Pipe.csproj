@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Anteater.Pipe</PackageId>
-    <Version>1.0.0$(VersionSuffix)</Version>
+    <PackageId>Anteater.Pipe</PackageId>    
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <RepositoryUrl>https://github.com/eshvatskyi/Anteater.Pipe</RepositoryUrl>
   </PropertyGroup>
