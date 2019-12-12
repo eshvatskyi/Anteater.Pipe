@@ -26,8 +26,13 @@ jobs:
         with:
           dotnet-version: 3.1.100
 
-      - name: Pack nuget package
+      - name: Pack nuget release package
+        if: steps.version.outputs.micro_patch == 0
         run: dotnet pack -c $BUILD_CONFIGURATION -p:PackageVersion=$RELEASE_VERSION -o ./out
+        
+      - name: Pack nuget pre-release package
+        if: steps.version.outputs.micro_patch > 0
+        run: dotnet pack -c $BUILD_CONFIGURATION -p:PackageVersion=$RELEASE_VERSION --version-suffix='.${{ steps.version.outputs.micro_patch }}' -o ./out
 
       - name: Publish
         if: success()
