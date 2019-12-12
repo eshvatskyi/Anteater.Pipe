@@ -20,27 +20,22 @@ jobs:
         uses: ncipollo/semantic-version-action@v1
 
       - name: Assigning release version
-        run: echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}"
+        run: |
+          echo "::set-env name=RELEASE_VERSION::${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}"
+          if [ ${{ steps.version.outputs.patch }} > 0 ]; then
+            echo "::set-env name=RELEASE_VERSION::${{ env.RELEASE_VERSION }}-build-${{ steps.version.outputs.micro_patch }}"
+          fi
 
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.100
 
       - name: Pack nuget release package
-        if: steps.version.outputs.micro_patch == 0
-        run: |
-          dotnet pack -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ env.RELEASE_VERSION }} -o ./out
-          echo "::set-env name=FILENAME_SUFFIX::${{ env.RELEASE_VERSION }}"
-        
-      - name: Pack nuget pre-release package
-        if: steps.version.outputs.micro_patch > 0
-        run: |
-          dotnet pack -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ env.RELEASE_VERSION }} --version-suffix='-build-${{ steps.version.outputs.micro_patch }}' -o ./out
-          echo "::set-env name=FILENAME_SUFFIX::${{ env.RELEASE_VERSION }}-build-${{ steps.version.outputs.micro_patch }}"
+        run: dotnet pack -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion='${{ env.RELEASE_VERSION }}' -o ./out
 
       - name: Publish
         if: success()
-        run: dotnet nuget push ./out/Anteater.Pipe.${{ env.FILENAME_SUFFIX }}.nupkg -k ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./out/Anteater.Pipe.${{ env.RELEASE_VERSION }}.nupkg -k ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
 
       - name: Creating release
         uses: actions/create-release@v1.0.0
@@ -48,6 +43,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ env.FILENAME_SUFFIX }}
+          release_name: Release ${{ env.RELEASE_VERSION }}
           draft: false
           prerelease: ${{ steps.version.outputs.micro_patch > 0 }}
