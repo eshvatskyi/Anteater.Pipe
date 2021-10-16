@@ -17,20 +17,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [netcoreapp2.2, netcoreapp3.0]
+        framework: [netcoreapp3.1, net5.0]
 
     steps:
       - uses: actions/checkout@master
 
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 2.2.207
+          dotnet-version: 3.1.100
 
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.100
+          dotnet-version: 5.0.101
 
-      - run: rsync -a ${DOTNET_ROOT/3.1.100/2.2.207}/* $DOTNET_ROOT/
+      - run: rsync -a ${DOTNET_ROOT/3.1.100/5.0.101}/* $DOTNET_ROOT/
 
       - name: Test
         run: dotnet test -c ${{ env.BUILD_CONFIGURATION }} -f ${{ matrix.framework }}
