@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
     <RepositoryRootDirectory>$(MSBuildThisFileDirectory)</RepositoryRootDirectory>
   </PropertyGroup>
 
